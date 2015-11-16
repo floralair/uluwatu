@@ -57,6 +57,35 @@ function addClusterListPanelJQEventListeners() {
         $jq('#toggle-cluster-block-btn').addClass('disabled');
         $jq('#sort-clusters-btn').addClass('disabled');
     });
+
+    $jq(document).on("click", ".credentialselect", function(e) {
+        goToPanel(this, 'credentials');
+    });
+    $jq(document).on("click", ".networkselect", function() {
+        goToPanel(this, 'network');
+    });
+    $jq(document).on("click", ".templateselect", function() {
+        goToPanel(this, 'templates');
+    });
+    $jq(document).on("click", ".securitygroupselect", function() {
+        goToPanel(this, 'securitygroup');
+    });
+
+    function goToPanel(pane, type) {
+        var segment = $jq(pane).attr('segment');
+        if (segment !== undefined) {
+            $jq('#panel-' + type + '-collapse').addClass('in');
+            $jq('' + segment).addClass('in');
+            $jq('#panel-' + type + '-collapse').parent().find('.panel-heading .btn i').removeClass('fa-angle-down').addClass('fa-angle-up');
+            var panel = $jq('' + segment).parent().parent();
+            var offset = panel.offset().top;
+            if (offset) {
+                $jq('html,body').animate({
+                    scrollTop: offset - 64
+                }, 500);
+            }
+        }
+    }
 }
 
 function addClusterFormJQEventListeners() {
@@ -70,6 +99,34 @@ function addClusterFormJQEventListeners() {
         });
         $jq(this).removeClass(active).addClass(selected);
     });
+    $jq(document).on("click", ".credentialselect", function(e) {
+        goToPanel(this, 'credentials');
+    });
+    $jq(document).on("click", ".networkselect", function() {
+        goToPanel(this, 'network');
+    });
+    $jq(document).on("click", ".templateselect", function() {
+        goToPanel(this, 'templates');
+    });
+    $jq(document).on("click", ".securitygroupselect", function() {
+        goToPanel(this, 'securitygroup');
+    });
+
+    function goToPanel(pane, type) {
+        var segment = $jq(pane).attr('segment');
+        if (segment !== undefined) {
+            $jq('#panel-' + type + '-collapse').addClass('in');
+            $jq('' + segment).addClass('in');
+            $jq('#panel-' + type + '-collapse').parent().find('.panel-heading .btn i').removeClass('fa-angle-down').addClass('fa-angle-up');
+            var panel = $jq('' + segment).parent().parent();
+            var offset = panel.offset().top;
+            if (offset) {
+                $jq('html,body').animate({
+                    scrollTop: offset - 64
+                }, 500);
+            }
+        }
+    }
 
     $jq('#cluster-form-panel .panel-heading > h5 > a').click(function(e) {
         e.preventDefault();
@@ -193,6 +250,13 @@ function addPanelJQueryEventListeners(panel) {
     $jq('#panel-' + panel + '-collapse .btn-row-over-panel > a').click(function(e) {
         e.preventDefault();
         $jq(this).parent().parent().next().collapse('toggle');
+        var panel = $jq(this).parent(); // panel
+        var offset = panel.offset().top;
+        if (offset) {
+            $jq('html,body').animate({
+                scrollTop: offset - 64
+            }, 500);
+        }
     });
     // create template/blueprint/credential panel shown
     $jq('#panel-create-' + panel + '-collapse').on('shown.bs.collapse', function(e) {
