@@ -36,29 +36,150 @@
                             </a>
                         </p>
                         <form class="form-horizontal" role="document">
-                            <!-- role: 'document' - non-editable "form" -->
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label" for="sl_ambariServerIp">{{msg.active_cluster_ambari_address_label}}</label>
-                                <div class="col-sm-9">
-                                    <p id="sl_ambariServerIp" class="form-control-static">
-                                        <div ng-if="activeCluster.cluster.ambariServerIp != null">
-                                            <a ng-show="activeCluster.cluster.ambariServerIp != null" target="_blank" href="http://{{activeCluster.cluster.ambariServerIp}}:8080">http://{{activeCluster.cluster.ambariServerIp}}:8080</a>
+
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label col-md-offset-1" for="sl_ambariServerIp">{{msg.active_cluster_ambari_address_label}}</label>
+                                        <div class="col-sm-7">
+                                            <p id="sl_ambariServerIp" class="form-control-static">
+                                                <div ng-if="activeCluster.cluster.ambariServerIp != null">
+                                                    <a ng-show="activeCluster.cluster.ambariServerIp != null" target="_blank" href="http://{{activeCluster.cluster.ambariServerIp}}:8080">http://{{activeCluster.cluster.ambariServerIp}}:8080</a>
+                                                </div>
+                                                <div ng-if="activeCluster.cluster.ambariServerIp == null">
+                                                    <a ng-show="activeCluster.cluster.ambariServerIp == null" target="_blank" href="">{{msg.active_cluster_ambari_not_available_label}}</a>
+                                                </div>
+                                            </p>
                                         </div>
-                                        <div ng-if="activeCluster.cluster.ambariServerIp == null">
-                                            <a ng-show="activeCluster.cluster.ambariServerIp == null" target="_blank" href="">{{msg.active_cluster_ambari_not_available_label}}</a>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label col-md-offset-1" for="sl_cloudPlatform">{{msg.active_cluster_platform_label}}</label>
+                                        <div class="col-sm-7">
+                                            <p id="sl_cloudPlatform" class="form-control-static">{{activeCluster.cloudPlatform}}</p>
                                         </div>
-                                    </p>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label col-md-offset-1" for="sl_platformVariant">{{msg.active_cluster_variant_label}}</label>
+                                        <div class="col-sm-7">
+                                            <p id="sl_platformVariant" class="form-control-static">{{activeCluster.platformVariant}}</p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label col-md-offset-1" for="sl_username">
+                                            </i>{{msg.active_cluster_username_label}}</label>
+                                        <div class="col-sm-7">
+                                            <p id="sl_username" class="form-control-static">{{activeCluster.cluster.userName}}
+                                                <a ng-if="activeCluster.cluster.ambariServerIp != null" class="btn-sm btn-info" role="button" data-toggle="modal" data-target="#modal-credential-cluster" style="text-decoration: none;">
+                                                    <i class="fa fa-key fa-fw"></i><span> {{msg.active_cluster_command_credential_label}}</span>
+                                                </a>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label col-md-offset-1" for="sl_nodeCount">{{msg.active_cluster_node_count_label}}</label>
+                                        <div class="col-sm-7">
+                                            <p id="sl_nodeCount" class="form-control-static">{{activeCluster.nodeCount}}</p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label col-md-offset-1" for="sl_region">{{msg.active_cluster_region_label}}</label>
+                                        <div class="col-sm-7" ng-if="activeCluster.cloudPlatform == 'AWS' ">
+                                            <p id="sl_region" class="form-control-static" ng-repeat="item in $root.config.AWS.awsRegions | filter:{key: activeCluster.region}:true">{{item.value}}</p>
+                                        </div>
+                                        <div class="col-sm-7" ng-if="activeCluster.cloudPlatform == 'GCP' ">
+                                            <p id="sl_region" class="form-control-static" ng-repeat="item in $root.config.GCP.gcpRegions | filter:{key: activeCluster.region}:true">{{item.value}}</p>
+                                        </div>
+                                        <div class="col-sm-7" ng-if="activeCluster.cloudPlatform == 'AZURE' ">
+                                            <p id="sl_region" class="form-control-static" ng-repeat="item in $root.config.AZURE.azureRegions | filter:{key: activeCluster.region}:true">{{item.value}}</p>
+                                        </div>
+                                        <div class="col-sm-7" ng-if="activeCluster.cloudPlatform == 'AZURE_RM' ">
+                                            <p id="sl_region" class="form-control-static" ng-repeat="item in $root.config.AZURE_RM.azureRegions | filter:{key: activeCluster.region}:true">{{item.value}}</p>
+                                        </div>
+                                        <div class="col-sm-7" ng-if="activeCluster.cloudPlatform == 'OPENSTACK' ">
+                                            <p id="sl_region" class="form-control-static" ng-repeat="item in $root.config.OPENSTACK.regions | filter:{key: activeCluster.region}:true">{{item.value}}</p>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label col-md-offset-1" for="sl_credential_active">{{msg.active_cluster_credential_label}}</label>
+                                        <div class="credentialselect col-sm-7">
+                                            <a id="sl_credential_active" segment="#panel-credential-collapse{{activeClusterCredential.id}}" class="credentialselect form-control-static review-a" ng-repeat="credential in $root.credentials|filter: { id: activeClusterCredential.id }:true">{{activeClusterCredential.name}}</a>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label col-md-offset-1" for="sl_network_active">{{msg.active_cluster_network_label}}</label>
+                                        <div class="networkselect col-sm-7">
+                                            <a id="sl_network_active" class="networkselect form-control-static review-a" ng-repeat="network in $root.networks|filter: { id: $root.activeCluster.networkId }:false" segment="#panel-network-collapse{{$root.activeCluster.networkId}}">{{network.name}}</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-7 col-md-offset-1">
+                                    <div class="row" style="margin-bottom: 30px;">
+                                        <div class="col-sm-11 col-md-offset-1" data-example-id="togglable-tabs">
+                                            <ul id="myTabs" class="nav nav-tabs" role="tablist">
+                                                <li role="presentation" ng-class="{true:'active', false:''}[group.group == $root.activeCluster.activeGroup]" ng-repeat="group in $root.activeCluster.instanceGroups| orderBy: 'group'"><a ng-click="changeActiveClusterGroup(group.group)" href="" id="{{group.group}}-tab" role="tab" data-toggle="tab" aria-controls="{{group.group}}" aria-expanded="true">{{group.group}}</a></li>
+                                            </ul>
+                                            <div id="myTabContent" class="tab-content">
+                                                <div role="tabpanel" class="tab-pane fade active review-tab" ng-class="{true:'in', false:''}[group.group == $root.activeCluster.activeGroup]" ng-hide="group.group != $root.activeCluster.activeGroup" ng-show="group.group == $root.activeCluster.activeGroup" ng-repeat="group in $root.activeCluster.instanceGroups" id="{{group.group}}" aria-labelledby="{{group.group}}-tab">
+                                                    <div class="container">
+                                                        <div class="form-group">
+                                                            <label class="col-sm-2 control-label" for="sl_template_active">Template: </label>
+                                                            <div class="templateselect col-sm-10">
+                                                                <a id="sl_template_active" class="templateselect form-control-static review-a" ng-repeat="template in $root.templates|filter: { id: group.templateId }:true" segment="#panel-template-collapse{{template.id}}">{{template.name}}</a>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label class="col-sm-2 control-label" for="sl_securitygroup_active">Security group: </label>
+                                                            <div class="securitygroupselect col-sm-10">
+                                                                <a id="sl_securitygroup_active" class="securitygroupselect form-control-static review-a" ng-repeat="securitygroup in $root.securitygroups|filter: { id: $root.activeCluster.securityGroupId }:true" segment="#panel-securitygroup-collapse{{securitygroup.id}}">{{securitygroup.name}}</a>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="col-sm-2 control-label" for="sl_nodecount">Node count: </label>
+                                                            <div class="col-sm-10">
+                                                                <p id="sl_nodecount" class="form-control-static">{{group.nodeCount}}</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group" ng-show="group.group != 'cbgateway'">
+                                                            <label class="col-sm-2 control-label" for="sl_comps_active">Components: </label>
+                                                            <div class="col-sm-5 ">
+                                                                <div class="host-group-table row" ng-repeat="hostgroup in $root.activeClusterBlueprint.ambariBlueprint.host_groups|filter: { name: group.group }:true">
+                                                                    <div class="list-group">
+                                                                        <a href="" class="list-group-item active" style="text-decoration: none;    font-size: 15px;">{{hostgroup.name}}</a>
+                                                                        <a href="" ng-repeat="component in hostgroup.components" class="list-group-item" style="text-decoration: none;    font-size: 15px;">{{component.name}}</a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label" for="sl_cloudPlatform">{{msg.active_cluster_platform_label}}</label>
+                            <div class="form-group" ng-if="activeCluster.cluster.statusReason === null && (activeCluster.statusReason != null && activeCluster.statusReason != '')">
+                                <label class="col-sm-2 control-label " for="sl_cloudStatus">{{msg.active_cluster_status_label}}</label>
                                 <div class="col-sm-9">
-                                    <p id="sl_cloudPlatform" class="form-control-static">{{activeCluster.cloudPlatform}}</p>
+                                    <p id="sl_cloudStatus" class="form-control-static">{{activeCluster.statusReason}}</p>
+                                </div>
+                                <div class="col-sm-7" ng-if="activeCluster.cluster.statusReason != null && activeCluster.cluster.statusReason != ''">
+                                    <p id="sl_cloudStatus" class="form-control-static">{{activeCluster.cluster.statusReason}}</p>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-if="activeCluster.cluster.statusReason != null && activeCluster.cluster.statusReason != ''">
+                                <label class="col-sm-2 control-label" for="sl_cloudStatus">{{msg.active_cluster_status_label}}</label>
+                                <div class="col-sm-9">
+                                    <p id="sl_cloudStatus" class="form-control-static">{{activeCluster.cluster.statusReason}}</p>
                                 </div>
                             </div>
                             <div class="form-group" ng-show="activeCluster.copyState && activeCluster.copyState!=100 && (activeCluster.status != 'AVAILABLE' || activeCluster.status != 'DELETE_IN_PROGRESS' || activeCluster.status != 'CREATE_FAILED')">
-                                <label class="col-sm-3 control-label" for="sl_imagecopy">{{msg.active_cluster_image_copy_label}}</label>
-                                <div class="col-sm-6" style="padding-left: 10px;">
+                                <label class="col-sm-2 control-label" for="sl_imagecopy">{{msg.active_cluster_image_copy_label}}</label>
+                                <div class="col-sm-9" style="padding-left: 10px;">
                                     <div class="progress" style="height: 25px;margin-bottom: 0px;">
                                         <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="{{activeCluster.copyState}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em;width: {{activeCluster.copyState}}%;;padding-top: 4px;">
                                             {{activeCluster.copyState}}%
@@ -67,124 +188,11 @@
                                 </div>
                             </div>
                             <div class="form-group" ng-show="activeCluster.ambariProgressState && activeCluster.ambariProgressState!=100 && (activeCluster.status != 'AVAILABLE' || activeCluster.status != 'DELETE_IN_PROGRESS' || activeCluster.status != 'CREATE_FAILED')">
-                                <label class="col-sm-3 control-label" for="sl_imagecopy">{{msg.active_cluster_ambari_progress_label}}</label>
-                                <div class="col-sm-6" style="padding-left: 10px;">
+                                <label class="col-sm-2 control-label" for="sl_imagecopy">{{msg.active_cluster_ambari_progress_label}}</label>
+                                <div class="col-sm-9" style="padding-left: 10px;">
                                     <div class="progress" style="height: 25px;margin-bottom: 0px;">
                                         <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="{{activeCluster.ambariProgressState}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em;width: {{activeCluster.ambariProgressState}}%;;padding-top: 4px;">
                                             {{activeCluster.ambariProgressState}}%
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label" for="sl_platformVariant">{{msg.active_cluster_variant_label}}</label>
-                                <div class="col-sm-9">
-                                    <p id="sl_platformVariant" class="form-control-static">{{activeCluster.platformVariant}}</p>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label" for="sl_username">
-                                    </i>{{msg.active_cluster_username_label}}</label>
-                                <div class="col-sm-9">
-                                    <p id="sl_username" class="form-control-static">{{activeCluster.cluster.userName}}
-                                        <a ng-if="activeCluster.cluster.ambariServerIp != null" class="btn-sm btn-info" role="button" data-toggle="modal" data-target="#modal-credential-cluster" style="text-decoration: none;">
-                                            <i class="fa fa-key fa-fw"></i><span> {{msg.active_cluster_command_credential_label}}</span>
-                                        </a>
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label" for="sl_nodeCount">{{msg.active_cluster_node_count_label}}</label>
-                                <div class="col-sm-9">
-                                    <p id="sl_nodeCount" class="form-control-static">{{activeCluster.nodeCount}}</p>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label" for="sl_region">{{msg.active_cluster_region_label}}</label>
-                                <div class="col-sm-9" ng-if="activeCluster.cloudPlatform == 'AWS' ">
-                                    <p id="sl_region" class="form-control-static" ng-repeat="item in $root.config.AWS.awsRegions | filter:{key: activeCluster.region}:true">{{item.value}}</p>
-                                </div>
-                                <div class="col-sm-9" ng-if="activeCluster.cloudPlatform == 'GCP' ">
-                                    <p id="sl_region" class="form-control-static" ng-repeat="item in $root.config.GCP.gcpRegions | filter:{key: activeCluster.region}:true">{{item.value}}</p>
-                                </div>
-                                <div class="col-sm-9" ng-if="activeCluster.cloudPlatform == 'AZURE' ">
-                                    <p id="sl_region" class="form-control-static" ng-repeat="item in $root.config.AZURE.azureRegions | filter:{key: activeCluster.region}:true">{{item.value}}</p>
-                                </div>
-                                <div class="col-sm-9" ng-if="activeCluster.cloudPlatform == 'AZURE_RM' ">
-                                    <p id="sl_region" class="form-control-static" ng-repeat="item in $root.config.AZURE_RM.azureRegions | filter:{key: activeCluster.region}:true">{{item.value}}</p>
-                                </div>
-                                <div class="col-sm-9" ng-if="activeCluster.cloudPlatform == 'OPENSTACK' ">
-                                    <p id="sl_region" class="form-control-static" ng-repeat="item in $root.config.OPENSTACK.regions | filter:{key: activeCluster.region}:true">{{item.value}}</p>
-                                </div>
-                            </div>
-
-                            <div class="form-group" ng-if="activeCluster.cluster.statusReason === null && (activeCluster.statusReason != null && activeCluster.statusReason != '')">
-                                <label class="col-sm-3 control-label" for="sl_cloudStatus">{{msg.active_cluster_status_label}}</label>
-                                <div class="col-sm-9">
-                                    <p id="sl_cloudStatus" class="form-control-static">{{activeCluster.statusReason}}</p>
-                                </div>
-                                <div class="col-sm-9" ng-if="activeCluster.cluster.statusReason != null && activeCluster.cluster.statusReason != ''">
-                                    <p id="sl_cloudStatus" class="form-control-static">{{activeCluster.cluster.statusReason}}</p>
-                                </div>
-                            </div>
-                            <div class="form-group" ng-if="activeCluster.cluster.statusReason != null && activeCluster.cluster.statusReason != ''">
-                                <label class="col-sm-3 control-label" for="sl_cloudStatus">{{msg.active_cluster_status_label}}</label>
-                                <div class="col-sm-9">
-                                    <p id="sl_cloudStatus" class="form-control-static">{{activeCluster.cluster.statusReason}}</p>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label" for="sl_credential_active">{{msg.active_cluster_credential_label}}</label>
-                                <div class="credentialselect col-sm-8">
-                                    <a id="sl_credential_active" segment="#panel-credential-collapse{{activeClusterCredential.id}}" class="credentialselect form-control-static review-a" ng-repeat="credential in $root.credentials|filter: { id: activeClusterCredential.id }:true">{{activeClusterCredential.name}}</a>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label" for="sl_network_active">{{msg.active_cluster_network_label}}</label>
-                                <div class="networkselect col-sm-8">
-                                    <a id="sl_network_active" class="networkselect form-control-static review-a" ng-repeat="network in $root.networks|filter: { id: $root.activeCluster.networkId }:false" segment="#panel-network-collapse{{$root.activeCluster.networkId}}">{{network.name}}</a>
-                                </div>
-                            </div>
-                            <div class="row" style="margin-top: 20px;    margin-bottom: 30px;">
-                                <div class="col-sm-8 col-md-offset-2" data-example-id="togglable-tabs">
-                                    <ul id="myTabs" class="nav nav-tabs" role="tablist">
-                                        <li role="presentation" ng-class="{true:'active', false:''}[group.group == $root.activeCluster.activeGroup]" ng-repeat="group in $root.activeCluster.instanceGroups| orderBy: 'group'"><a  ng-click="changeActiveClusterGroup(group.group)" href="" id="{{group.group}}-tab" role="tab" data-toggle="tab" aria-controls="{{group.group}}" aria-expanded="true">{{group.group}}</a></li>
-                                    </ul>
-                                    <div id="myTabContent" class="tab-content">
-                                        <div role="tabpanel" class="tab-pane fade active review-tab" ng-class="{true:'in', false:''}[group.group == $root.activeCluster.activeGroup]" ng-hide="group.group != $root.activeCluster.activeGroup" ng-show="group.group == $root.activeCluster.activeGroup" ng-repeat="group in $root.activeCluster.instanceGroups" id="{{group.group}}" aria-labelledby="{{group.group}}-tab">
-                                            <div class="container">
-                                                <div class="form-group">
-                                                    <label class="col-sm-3 control-label" for="sl_template_active">Template: </label>
-                                                    <div class="templateselect col-sm-8">
-                                                        <a id="sl_template_active" class="templateselect form-control-static review-a" ng-repeat="template in $root.templates|filter: { id: group.templateId }:true" segment="#panel-template-collapse{{template.id}}">{{template.name}}</a>
-                                                    </div>
-                                                </div>
-
-                                                <div class="form-group">
-                                                    <label class="col-sm-3 control-label" for="sl_securitygroup_active">Security group: </label>
-                                                    <div class="securitygroupselect col-sm-8">
-                                                        <a id="sl_securitygroup_active" class="securitygroupselect form-control-static review-a" ng-repeat="securitygroup in $root.securitygroups|filter: { id: $root.activeCluster.securityGroupId }:true" segment="#panel-securitygroup-collapse{{securitygroup.id}}">{{securitygroup.name}}</a>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="col-sm-3 control-label" for="sl_nodecount">Node count: </label>
-                                                    <div class="col-sm-8">
-                                                        <p id="sl_nodecount" class="form-control-static">{{group.nodeCount}}</p>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group" ng-show="group.group != 'cbgateway'">
-                                                    <label class="col-sm-3 control-label" for="sl_comps_active">Components: </label>
-                                                    <div class="col-sm-7">
-                                                        <div class="host-group-table row" ng-repeat="hostgroup in $root.activeClusterBlueprint.ambariBlueprint.host_groups|filter: { name: group.group }:true">
-                                                            <div class="list-group">
-                                                                <a href="" class="list-group-item active" style="text-decoration: none;    font-size: 15px;">{{hostgroup.name}}</a>
-                                                                <a href="" ng-repeat="component in hostgroup.components" class="list-group-item" style="text-decoration: none;    font-size: 15px;">{{component.name}}</a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -553,7 +561,7 @@
                                 <label class="col-sm-4 control-label" for="newPasswordforce">{{msg.cluster_form_ambari_new_password_label}}</label>
                                 <div class="col-sm-8">
                                     <input type="password" name="newPasswordforce" match="newCredential.newPassword" class="form-control" id="newPasswordforce" ng-model="newCredential.newPasswordforce" placeholder="{{msg.cluster_form_ambari_password_placeholder}}" ng-minlength="5" ng-maxlength="50" required>
-                                    <div class="help-block" ng-show="changeCredential.newPasswordforce.$dirty && changeCredential.newPasswordforce.$invalid"><i class="fa fa-warning"></i> {{msg.error_change_credentail_cluster}}
+                                    <div class="help-block" ng-show="changeCredential.newPasswordforce.$dirty && changeCredential.newPasswordforce.$invalid"><i class="fa fa-warning"></i>{{msg.error_change_credentail_cluster}}
                                     </div>
                                 </div>
                             </div>
